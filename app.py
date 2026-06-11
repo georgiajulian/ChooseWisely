@@ -119,7 +119,7 @@ if "step" not in st.session_state:
 # HEADER
 # ============================================================
 with st.container():
-    st.markdown("<h1 style='text-align:center; margin-bottom:0.2rem;'>🛡️ TrustNoOne</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center; margin-bottom:0.2rem;'>🛡️ ChooseWisely</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center; color: var(--text-secondary); margin-top:0; font-size: 1.1rem;'>Interactive Anti-Scam Awareness Drama</p>", unsafe_allow_html=True)
     st.divider()
 
@@ -135,10 +135,40 @@ def show_progress(story_memory: dict):
 # STATE 1: SETUP
 # ============================================================
 if st.session_state.step == "setup":
+    
+    # 1. Ask for Name if not already provided in this session
+    if not st.session_state.get("user_name"):
+        with st.container():
+            st.markdown("""
+            <div class="modern-card" style="text-align: center;">
+                <h2>🛡️ Welcome to ChooseWisely</h2>
+                <p style="color: var(--text-secondary);">Enter your name to personalize your interactive anti-scam experience.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            user_name = st.text_input(
+                "Your Name", 
+                placeholder="e.g., Alex", 
+                max_chars=20,
+                key="name_input"
+            )
+            
+            if st.button("🚀 Continue", type="primary", use_container_width=True):
+                if user_name.strip():
+                    # .title() capitalizes the first letter (e.g., "alex" -> "Alex")
+                    st.session_state.user_name = user_name.strip().title()
+                    st.rerun()
+                else:
+                    st.warning("Please enter your name to continue.")
+        
+        # Stop rendering the rest of the setup until a name is provided
+        st.stop()
+
+    # 2. Scenario Selection (Only shows AFTER name is provided)
     with st.container():
-        st.markdown("""
+        st.markdown(f"""
         <div class="modern-card">
-            <h3>🎬 Experience a Realistic Scam Scenario</h3>
+            <h3>🎬 Welcome, {st.session_state.user_name}. Experience a Realistic Scam Scenario</h3>
             <p>Spot the red flags, make your choices, and see the consequences before it's too late.</p>
         </div>
         """, unsafe_allow_html=True)
@@ -158,7 +188,7 @@ if st.session_state.step == "setup":
         if scenario_idea == "custom":
             scenario_idea = st.text_input("Describe your custom scenario:", placeholder="e.g., A fake bank SMS...")
 
-        if st.button("🚀 Start the Simulation", type="primary", use_container_width=True):
+        if st.button("🎬 Start the Simulation", type="primary", use_container_width=True):
             if scenario_idea.strip():
                 st.session_state.scenario_idea = scenario_idea
                 st.session_state.step = "processing_scene_1"
@@ -176,12 +206,16 @@ elif st.session_state.step in ["processing_scene_1", "processing_choice"]:
     try:
         with st.status("🧠 AI Director writing next scene...", expanded=True) as status:
             if st.session_state.step == "processing_scene_1":
-                scene_data = scriptwriter.generate_scenario(st.session_state.scenario_idea)
+                scene_data = scriptwriter.generate_scenario(
+                    scenario_idea = st.session_state.scenario_idea,
+                    user_name     = st.session_state.get("user_name", "User")
+                )
             else:
                 scene_data = scriptwriter.generate_scenario(
-                    scenario_idea=st.session_state.scenario_idea,
-                    story_memory=st.session_state.story_memory,
-                    user_choice=st.session_state.last_choice
+                    scenario_idea = st.session_state.scenario_idea,
+                    story_memory  = st.session_state.story_memory,
+                    user_choice   = st.session_state.last_choice,
+                    user_name     = st.session_state.get("user_name", "User")
                 )
             st.write("✅ Script finalized. Generating cinematic video...")
     except Exception as e:
@@ -335,7 +369,7 @@ elif st.session_state.step == "game_over":
         st.markdown("</div>", unsafe_allow_html=True)
         
         with open(st.session_state.compiled_movie, "rb") as f:
-            st.download_button(label="⬇️ Download My Movie", data=f, file_name="TrustNoOne_MyStory.mp4", mime="video/mp4", use_container_width=True)
+            st.download_button(label="⬇️ Download My Movie", data=f, file_name="ChooseWisely_MyStory.mp4", mime="video/mp4", use_container_width=True)
         st.divider()
 
     st.markdown("## 🧠 Personal Security Debrief")
