@@ -1,0 +1,6 @@
+streamlit
+openai
+python-dotenv
+requests
+edge-tts
+moviepy==1.0.3
