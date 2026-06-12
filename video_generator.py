@@ -15,7 +15,7 @@ MAX_RETRIES      = 2        # Retry failed submissions once before giving up
 
 WORKSPACE_ID = os.getenv("DASHSCOPE_WORKSPACE_ID")   # e.g. "ws-abc123"
 
-# 🚨 HACKATHON LIFESAVER: Set to True to save credits while building the UI!
+# Save Token: Set to True to save credits while building the UI
 MOCK_MODE = True
 MOCK_VIDEO_URL = "https://www.w3schools.com/html/mov_bbb.mp4"
 
@@ -140,9 +140,9 @@ def generate_video_clip(
         RuntimeError — API submission failed or task failed
     """
     
-    # 🚨 MOCK MODE CHECK (Fixed indentation and moved docstring to the top!)
+    # MOCK MODE CHECK 
     if MOCK_MODE:
-        print("🚨 MOCK MODE ACTIVE: Skipping Wan API to save credits. Using placeholder video.")
+        print(" MOCK MODE ACTIVE: Skipping Wan API to save credits. Using placeholder video.")
         print(f"   (Prompt was: {visual_prompt[:50]}...)")
         time.sleep(2) # Fake a 2-second delay so the UI spinner looks natural
         return MOCK_VIDEO_URL
